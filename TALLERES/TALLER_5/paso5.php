@@ -1,119 +1,135 @@
 <?php
-
-$jsonDatos = '
-{
-    "tienda": "ElectroTech",
-    "productos": [
-        {"id": 1, "nombre": "Laptop Gamer", "precio": 1200, "categorias": ["electrónica", "computadoras"]},
-        {"id": 2, "nombre": "Smartphone 5G", "precio": 800, "categorias": ["electrónica", "celulares"]},
-        {"id": 3, "nombre": "Auriculares Bluetooth", "precio": 150, "categorias": ["electrónica", "accesorios"]},
-        {"id": 4, "nombre": "Smart TV 4K", "precio": 700, "categorias": ["electrónica", "televisores"]},
-        {"id": 5, "nombre": "Tablet", "precio": 300, "categorias": ["electrónica", "computadoras"]}
+// 1. Crear un arreglo multidimensional de ventas por región y producto
+$ventas = [
+    "Norte" => [
+        "Producto A" => [100, 120, 140, 110, 130],
+        "Producto B" => [85, 95, 105, 90, 100],
+        "Producto C" => [60, 55, 65, 70, 75]
     ],
-    "clientes": [
-        {"id": 101, "nombre": "Ana López", "email": "ana@example.com"},
-        {"id": 102, "nombre": "Carlos Gómez", "email": "carlos@example.com"},
-        {"id": 103, "nombre": "María Rodríguez", "email": "maria@example.com"}
+    "Sur" => [
+        "Producto A" => [80, 90, 100, 85, 95],
+        "Producto B" => [120, 110, 115, 125, 130],
+        "Producto C" => [70, 75, 80, 65, 60]
+    ],
+    "Este" => [
+        "Producto A" => [110, 115, 120, 105, 125],
+        "Producto B" => [95, 100, 90, 105, 110],
+        "Producto C" => [50, 60, 55, 65, 70]
+    ],
+    "Oeste" => [
+        "Producto A" => [90, 85, 95, 100, 105],
+        "Producto B" => [105, 110, 100, 115, 120],
+        "Producto C" => [80, 85, 75, 70, 90]
     ]
-}
-';
-
-$tiendaData = json_decode($jsonDatos, true);
-
-function imprimirProductos($productos) {
-    foreach ($productos as $producto) {
-        echo "{$producto['nombre']} - \${$producto['precio']} - Categorías: " . implode(", ", $producto['categorias']) . "\n";
-    }
-}
-
-echo "Productos de {$tiendaData['tienda']}:\n";
-imprimirProductos($tiendaData['productos']);
-
-$valorTotal = array_reduce($tiendaData['productos'], function($total, $producto) {
-    return $total + $producto['precio'];
-}, 0);
-
-echo "\nValor total del inventario: \${$valorTotal}\n";
-
-$productoMasCaro = array_reduce($tiendaData['productos'], function($max, $producto) {
-    return ($producto['precio'] > $max['precio']) ? $producto : $max;
-}, $tiendaData['productos'][0]);
-
-echo "\nProducto más caro: {$productoMasCaro['nombre']} (\${$productoMasCaro['precio']})\n";
-
-function filtrarPorCategoria($productos, $categoria) {
-    return array_filter($productos, function($producto) use ($categoria) {
-        return in_array($categoria, $producto['categorias']);
-    });
-}
-
-$productosDeComputadoras = filtrarPorCategoria($tiendaData['productos'], "computadoras");
-echo "\nProductos en la categoría 'computadoras':\n";
-imprimirProductos($productosDeComputadoras);
-
-$nuevoProducto = [
-    "id" => 6,
-    "nombre" => "Smartwatch",
-    "precio" => 250,
-    "categorias" => ["electrónica", "accesorios", "wearables"]
 ];
-$tiendaData['productos'][] = $nuevoProducto;
 
-$jsonActualizado = json_encode($tiendaData, JSON_PRETTY_PRINT);
-echo "\nDatos actualizados de la tienda (JSON):\n$jsonActualizado\n";
+// 2. Función para calcular el promedio de ventas
+function promedioVentas($ventas) {
+    return array_sum($ventas) / count($ventas);
+}
 
-function generarResumenVentas($tiendaData) {
-    $ventas = [
-        ["producto_id" => 1, "cliente_id" => 101, "cantidad" => 1, "fecha" => "2024-09-10"],
-        ["producto_id" => 2, "cliente_id" => 102, "cantidad" => 2, "fecha" => "2024-09-11"],
-        ["producto_id" => 3, "cliente_id" => 103, "cantidad" => 1, "fecha" => "2024-09-12"],
-        ["producto_id" => 2, "cliente_id" => 101, "cantidad" => 1, "fecha" => "2024-09-13"],
-        ["producto_id" => 5, "cliente_id" => 102, "cantidad" => 3, "fecha" => "2024-09-14"]
-    ];
+// 3. Calcular y mostrar el promedio de ventas por región y producto
+echo "Promedio de ventas por región y producto:\n";
+foreach ($ventas as $region => $productos) {
+    echo "$region:\n";
+    foreach ($productos as $producto => $ventasProducto) {
+        $promedio = promedioVentas($ventasProducto);
+        echo "  $producto: " . number_format($promedio, 2) . "\n";
+    }
+    echo "\n";
+}
 
-    $totalVentas = 0;
-    $productosVendidos = [];
-    $clientesCompra = [];
-
-    foreach ($ventas as $venta) {
-        $productoId = $venta['producto_id'];
-        $clienteId = $venta['cliente_id'];
-        $cantidad = $venta['cantidad'];
-
-        $producto = array_filter($tiendaData['productos'], fn($p) => $p['id'] == $productoId);
-        $producto = reset($producto); 
-        $totalVentas += $producto['precio'] * $cantidad;
-
-        if (!isset($productosVendidos[$productoId])) {
-            $productosVendidos[$productoId] = 0;
+// 4. Función para encontrar el producto más vendido en una región
+function productoMasVendido($productos) {
+    $maxVentas = 0;
+    $productoTop = '';
+    foreach ($productos as $producto => $ventas) {
+        $totalVentas = array_sum($ventas);
+        if ($totalVentas > $maxVentas) {
+            $maxVentas = $totalVentas;
+            $productoTop = $producto;
         }
-        $productosVendidos[$productoId] += $cantidad;
+    }
+    return [$productoTop, $maxVentas];
+}
 
-        if (!isset($clientesCompra[$clienteId])) {
-            $clientesCompra[$clienteId] = 0;
+// 5. Encontrar y mostrar el producto más vendido por región
+echo "Producto más vendido por región:\n";
+foreach ($ventas as $region => $productos) {
+    [$productoTop, $ventasTop] = productoMasVendido($productos);
+    echo "$region: $productoTop (Total: $ventasTop)\n";
+}
+
+// 6. Calcular las ventas totales por producto
+$ventasTotalesPorProducto = [];
+foreach ($ventas as $region => $productos) {
+    foreach ($productos as $producto => $ventasProducto) {
+        if (!isset($ventasTotalesPorProducto[$producto])) {
+            $ventasTotalesPorProducto[$producto] = 0;
         }
-        $clientesCompra[$clienteId] += $cantidad;
+        $ventasTotalesPorProducto[$producto] += array_sum($ventasProducto);
+    }
+}
+
+echo "\nVentas totales por producto:\n";
+arsort($ventasTotalesPorProducto);
+foreach ($ventasTotalesPorProducto as $producto => $total) {
+    echo "$producto: $total\n";
+}
+
+// 7. Encontrar la región con mayores ventas totales
+$ventasTotalesPorRegion = array_map(function($productos) {
+    return array_sum(array_map('array_sum', $productos));
+}, $ventas);
+
+$regionTopVentas = array_keys($ventasTotalesPorRegion, max($ventasTotalesPorRegion))[0];
+echo "\nRegión con mayores ventas totales: $regionTopVentas\n";
+
+// TAREA: Implementa una función que analice el crecimiento de ventas
+function analizarCrecimientoVentas($ventas) {
+    $crecimientoPorProductoYRegion = [];
+    foreach ($ventas as $region => $productos) {
+        foreach ($productos as $producto => $ventasProducto) {
+            $inicio = $ventasProducto[0]; // Ventas del primer mes
+            $fin = end($ventasProducto); // Ventas del último mes
+            $crecimiento = (($fin - $inicio) / $inicio) * 100; // Porcentaje de crecimiento
+
+            $crecimientoPorProductoYRegion[$region][$producto] = $crecimiento;
+        }
     }
 
-    $productoMasVendidoId = array_search(max($productosVendidos), $productosVendidos);
-    $productoMasVendido = array_filter($tiendaData['productos'], fn($p) => $p['id'] == $productoMasVendidoId);
-    $productoMasVendido = reset($productoMasVendido);
+    // Identificar el producto y la región con mayor crecimiento
+    $mayorCrecimiento = 0;
+    $productoMayorCrecimiento = '';
+    $regionMayorCrecimiento = '';
 
-    $clienteMayorCompradorId = array_search(max($clientesCompra), $clientesCompra);
-    $clienteMayorComprador = array_filter($tiendaData['clientes'], fn($c) => $c['id'] == $clienteMayorCompradorId);
-    $clienteMayorComprador = reset($clienteMayorComprador);
+    foreach ($crecimientoPorProductoYRegion as $region => $productos) {
+        foreach ($productos as $producto => $crecimiento) {
+            if ($crecimiento > $mayorCrecimiento) {
+                $mayorCrecimiento = $crecimiento;
+                $productoMayorCrecimiento = $producto;
+                $regionMayorCrecimiento = $region;
+            }
+        }
+    }
 
     return [
-        "total_ventas" => $totalVentas,
-        "producto_mas_vendido" => $productoMasVendido['nombre'],
-        "cliente_mayor_comprador" => $clienteMayorComprador['nombre']
+        'crecimientoPorProductoYRegion' => $crecimientoPorProductoYRegion,
+        'mayorCrecimiento' => $mayorCrecimiento,
+        'productoMayorCrecimiento' => $productoMayorCrecimiento,
+        'regionMayorCrecimiento' => $regionMayorCrecimiento,
     ];
 }
 
-$resumenVentas = generarResumenVentas($tiendaData);
-echo "\nResumen de ventas:\n";
-echo "Total de ventas: $" . $resumenVentas['total_ventas'] . "\n";
-echo "Producto más vendido: " . $resumenVentas['producto_mas_vendido'] . "\n";
-echo "Cliente que más ha comprado: " . $resumenVentas['cliente_mayor_comprador'] . "\n";
+$resultadoCrecimiento = analizarCrecimientoVentas($ventas);
+
+echo "\nCrecimiento de ventas:\n";
+foreach ($resultadoCrecimiento['crecimientoPorProductoYRegion'] as $region => $productos) {
+    foreach ($productos as $producto => $crecimiento) {
+        echo "$region - $producto: " . number_format($crecimiento, 2) . "%\n";
+    }
+}
+
+echo "\nProducto con mayor crecimiento: {$resultadoCrecimiento['productoMayorCrecimiento']} en {$resultadoCrecimiento['regionMayorCrecimiento']} (Crecimiento: {$resultadoCrecimiento['mayorCrecimiento']}%)\n";
 
 ?>
