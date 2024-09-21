@@ -132,4 +132,56 @@ foreach ($resultadoCrecimiento['crecimientoPorProductoYRegion'] as $region => $p
 
 echo "\nProducto con mayor crecimiento: {$resultadoCrecimiento['productoMayorCrecimiento']} en {$resultadoCrecimiento['regionMayorCrecimiento']} (Crecimiento: {$resultadoCrecimiento['mayorCrecimiento']}%)\n";
 
+// NUEVA TAREA: Resumen de ventas
+// Arreglo de ventas (producto_id, cliente_id, cantidad, fecha)
+$ventasRealizadas = [
+    ['producto_id' => 1, 'cliente_id' => 101, 'cantidad' => 2, 'fecha' => '2023-01-01'],
+    ['producto_id' => 2, 'cliente_id' => 102, 'cantidad' => 1, 'fecha' => '2023-01-02'],
+    ['producto_id' => 3, 'cliente_id' => 101, 'cantidad' => 3, 'fecha' => '2023-01-03'],
+    ['producto_id' => 1, 'cliente_id' => 103, 'cantidad' => 1, 'fecha' => '2023-01-04'],
+    ['producto_id' => 2, 'cliente_id' => 101, 'cantidad' => 4, 'fecha' => '2023-01-05'],
+];
+
+// Función para generar un resumen de ventas
+function generarResumenVentas($ventasRealizadas) {
+    $totalVentas = 0;
+    $productosVendidos = [];
+    $clientesCompraFrecuente = [];
+
+    foreach ($ventasRealizadas as $venta) {
+        $totalVentas += $venta['cantidad'];
+
+        // Contar productos vendidos
+        if (!isset($productosVendidos[$venta['producto_id']])) {
+            $productosVendidos[$venta['producto_id']] = 0;
+        }
+        $productosVendidos[$venta['producto_id']] += $venta['cantidad'];
+
+        // Contar compras por cliente
+        if (!isset($clientesCompraFrecuente[$venta['cliente_id']])) {
+            $clientesCompraFrecuente[$venta['cliente_id']] = 0;
+        }
+        $clientesCompraFrecuente[$venta['cliente_id']] += $venta['cantidad'];
+    }
+
+    // Producto más vendido
+    $productoMasVendido = array_keys($productosVendidos, max($productosVendidos))[0];
+
+    // Cliente que más ha comprado
+    $clienteMasComprador = array_keys($clientesCompraFrecuente, max($clientesCompraFrecuente))[0];
+
+    return [
+        'totalVentas' => $totalVentas,
+        'productoMasVendido' => $productoMasVendido,
+        'clienteMasComprador' => $clienteMasComprador,
+    ];
+}
+
+$resumen = generarResumenVentas($ventasRealizadas);
+
+echo "\nResumen de ventas:\n";
+echo "Total de ventas: {$resumen['totalVentas']}\n";
+echo "Producto más vendido: Producto ID {$resumen['productoMasVendido']}\n";
+echo "Cliente que más ha comprado: Cliente ID {$resumen['clienteMasComprador']}\n";
+
 ?>
