@@ -11,7 +11,7 @@ function validarEdad($edad) {
     return is_numeric($edad) && $edad >= 18 && $edad <= 120;
 }
 
-function validarSitioWeb($sitioWeb) {
+function validarSitio_web($sitioWeb) {  // Corregido el nombre de la función
     return empty($sitioWeb) || filter_var($sitioWeb, FILTER_VALIDATE_URL);
 }
 
@@ -46,5 +46,10 @@ function validarFotoPerfil($archivo) {
     }
 
     return true;
+}
+
+function validarFecha_nacimiento($fecha) {
+    // Puedes agregar validaciones adicionales para la fecha si lo consideras necesario.
+    return !empty($fecha);
 }
 ?>
