@@ -1,0 +1,134 @@
+/* Estilos Generales */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #4CAF50;
+    color: white;
+    text-align: center;
+    padding: 20px 0;
+}
+
+h1, h2 {
+    color: #333;
+}
+
+.container {
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.user-profile {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+}
+
+.user-profile img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin-right: 20px;
+}
+
+.user-profile p {
+    font-size: 16px;
+}
+
+.logout-btn {
+    background-color: #f44336;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.logout-btn:hover {
+    background-color: #e53935;
+}
+
+.search-section {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.search-section input[type="text"] {
+    width: 80%;
+    padding: 10px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.search-section button {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.search-section button:hover {
+    background-color: #45a049;
+}
+
+.books-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.books-list li {
+    display: flex;
+    margin-bottom: 20px;
+    background-color: white;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.books-list img {
+    max-width: 100px;
+    max-height: 150px;
+    margin-right: 20px;
+}
+
+.book-info {
+    flex: 1;
+}
+
+.book-info h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.book-info p {
+    margin: 5px 0;
+    color: #666;
+}
+
+.book-info a {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.book-info a:hover {
+    background-color: #45a049;
+}

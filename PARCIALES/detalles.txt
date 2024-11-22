@@ -1,0 +1,143 @@
+la parte del callback
+<?php
+session_start();
+
+// Configuración de credenciales de Google
+$googleClientId = '505423101388-iifot8hbh2ldbst0b1n79i2vl4v8oiv7.apps.googleusercontent.com';
+$googleClientSecret = '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';
+$googleRedirectUri = 'http://localhost/biblioteca/callback.php';
+
+// Verificar si el código está presente
+if (isset($_GET['code'])) {
+    // Obtener el código de la URL
+    $code = $_GET['code'];
+
+    // Obtener el token de acceso usando el código
+    $tokenUrl = 'https://oauth2.googleapis.com/token';
+    $postData = [
+        'code' => $code,
+        'client_id' => $googleClientId,
+        'client_secret' => $googleClientSecret,
+        'redirect_uri' => $googleRedirectUri,
+        'grant_type' => 'authorization_code'
+    ];
+
+    // Realizar la solicitud POST
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $tokenUrl);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postData));
+    $response = curl_exec($ch);
+    curl_close($ch);
+
+    // Decodificar la respuesta JSON
+    $responseData = json_decode($response, true);
+
+    if (isset($responseData['access_token'])) {
+        // Usar el token de acceso para obtener los datos del usuario
+        $accessToken = $responseData['access_token'];
+        $userInfoUrl = 'https://www.googleapis.com/oauth2/v2/userinfo';
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $userInfoUrl);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Authorization: Bearer ' . $accessToken]);
+        $userInfo = curl_exec($ch);
+        curl_close($ch);
+
+        // Decodificar la respuesta JSON
+        $userData = json_decode($userInfo, true);
+
+        // Guardar los datos del usuario en la sesión
+        $_SESSION['user'] = $userData;
+
+        // Redirigir a la página principal
+        header('Location: profile.php');
+        exit();
+    } else {
+        // Error al obtener el token de acceso
+        echo 'Error al obtener el token de acceso.';
+    }
+} else {
+    echo 'No se recibió el código de autenticación.';
+}
+?>
+
+parte del profile
+<?php
+session_start();
+
+// Verificar si el usuario está autenticado
+if (!isset($_SESSION['user'])) {
+    header('Location: index.php');
+    exit();
+}
+
+// Obtener los datos del usuario
+$userData = $_SESSION['user'];
+
+// Lógica para la búsqueda de libros
+$data = null;
+if (isset($_GET['query']) && !empty($_GET['query'])) {
+    $query = urlencode($_GET['query']);
+    $url = "https://www.googleapis.com/books/v1/volumes?q=$query";
+
+    $response = file_get_contents($url);
+    $data = json_decode($response, true);
+}
+?>
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Perfil del Usuario y Buscar Libros</title>
+    <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+    <header>
+        <h1>Perfil del Usuario y Buscar Libros</h1>
+    </header>
+
+    <div class="container">
+        <!-- Información del usuario autenticado -->
+        <div class="user-profile">
+            <div style="display: flex; align-items: center;">
+                <img src="<?php echo isset($userData['picture']) ? $userData['picture'] : 'ruta/a/imagen/por-defecto.jpg'; ?>" alt="Foto de perfil">
+                <div>
+                    <h2>Bienvenido, <?php echo htmlspecialchars(isset($userData['nombre']) ? $userData['nombre'] : 'Usuario desconocido'); ?></h2>
+                    <p>Correo electrónico: <?php echo htmlspecialchars(isset($userData['email']) ? $userData['email'] : 'Correo no disponible'); ?></p>
+                    <a href="logout.php" class="logout-btn">Cerrar sesión</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="search-section">
+            <h2>Buscar Libros</h2>
+            <!-- Formulario con el botón de limpiar -->
+            <form method="GET" action="">
+                <input type="text" name="query" placeholder="Buscar libros..." value="<?php echo isset($_GET['query']) ? htmlspecialchars($_GET['query']) : ''; ?>">
+                <button type="submit">Buscar</button>
+                <!-- Botón de limpiar -->
+                <button type="button" onclick="window.location.href = window.location.pathname;">Limpiar</button>
+            </form>
+
+            <!-- Mostrar resultados de la búsqueda -->
+            <?php if (isset($data['items'])): ?>
+                <ul class="books-list">
+                    <?php foreach ($data['items'] as $item): ?>
+                        <li>
+                            <img src="<?php echo isset($item['volumeInfo']['imageLinks']['thumbnail']) ? $item['volumeInfo']['imageLinks']['thumbnail'] : 'ruta/a/imagen/por-defecto.jpg'; ?>" alt="Portada">
+                            <div class="book-info">
+                                <h3><?php echo htmlspecialchars($item['volumeInfo']['title']); ?></h3>
+                                <p>Autor: <?php echo htmlspecialchars(implode(', ', $item['volumeInfo']['authors'])); ?></p>
+                                <a href="guardar_libro.php?id=<?php echo $item['id']; ?>">Guardar</a>
+                            </div>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
+        </div>
+    </div>
+</body>
+</html>
