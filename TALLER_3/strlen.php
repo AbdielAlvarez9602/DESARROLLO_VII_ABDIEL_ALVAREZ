@@ -7,7 +7,7 @@ $longitud = strlen($nombre);
 echo "El nombre '$nombre' tiene $longitud caracteres.";
 
 // Ejercicio: Crea una variable con tu nombre completo y usa strlen() para mostrar su longitud
-$miNombre = ""; // Reemplaza esto con tu nombre completo
+$miNombre = "Abdiel Saul Alvarez Rodriguez"; // Reemplaza esto con tu nombre completo
 $longitudMiNombre = strlen($miNombre);
 
 echo "Mi nombre completo tiene $longitudMiNombre caracteres.";
