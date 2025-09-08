@@ -1,1 +1,1 @@
-carpeta para los parciales
+﻿## Carpeta PARCIALES
