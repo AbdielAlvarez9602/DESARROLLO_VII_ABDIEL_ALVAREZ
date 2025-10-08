@@ -1,0 +1,39 @@
+[
+    {
+        "nombre": "Abdiel Alvarez",
+        "email": "abdielalvarez9602@gmail.com",
+        "fecha_nac": "2025-10-02",
+        "sitio_web": "https:\/\/github.com\/AbdielAlvarez9602\/DESARROLLO_VII_ABDIEL_ALVAREZ",
+        "genero": "masculino",
+        "intereses": [
+            "deportes"
+        ],
+        "comentarios": "Lo que quieras agregar",
+        "edad": 0
+    },
+    {
+        "nombre": "Abdiel Alvarez",
+        "email": "abdielalvarez9602@gmail.com",
+        "fecha_nac": "2025-10-02",
+        "sitio_web": "https:\/\/github.com\/AbdielAlvarez9602\/DESARROLLO_VII_ABDIEL_ALVAREZ",
+        "genero": "masculino",
+        "intereses": [
+            "deportes"
+        ],
+        "comentarios": "Lo que quieras agregar",
+        "edad": 0,
+        "foto_perfil": "uploads\/Captura de pantalla 2025-09-08 181514_1759367703.png"
+    },
+    {
+        "nombre": "Abdiel",
+        "email": "abdielalvarez962@gmail.com",
+        "fecha_nac": "2025-10-06",
+        "sitio_web": "https:\/\/github.com\/AbdielAlvarez9602\/DESARROLLO_VII_ABDIEL_ALVAREZ",
+        "genero": "masculino",
+        "intereses": [
+            "deportes"
+        ],
+        "comentarios": "dadw",
+        "edad": 0
+    }
+]
