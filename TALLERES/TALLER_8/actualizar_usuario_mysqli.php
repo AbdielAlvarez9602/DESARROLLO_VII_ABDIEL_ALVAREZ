@@ -1,0 +1,46 @@
+<?php
+require_once "config_mysqli.php";
+
+$id = $nombre = $email = "";
+$param_id = $param_nombre = $param_email = "";
+
+if($_SERVER["REQUEST_METHOD"] == "POST"){
+    $id = trim($_POST['id']);
+    $nombre = mysqli_real_escape_string($conn, $_POST['nombre']);
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    
+    $sql = "UPDATE usuarios SET nombre = ?, email = ? WHERE id = ?";
+    
+    if($stmt = mysqli_prepare($conn, $sql)){
+        mysqli_stmt_bind_param($stmt, "ssi", $param_nombre, $param_email, $param_id);
+        
+        $param_nombre = $nombre;
+        $param_email = $email;
+        $param_id = $id;
+        
+        if(mysqli_stmt_execute($stmt)){
+            echo "Usuario con ID **$id** actualizado con éxito.";
+        } else{
+            echo "ERROR: No se pudo ejecutar $sql. " . mysqli_error($conn);
+        }
+    }
+    
+    mysqli_stmt_close($stmt);
+}
+
+mysqli_close($conn);
+?>
+
+<!DOCTYPE html>
+<html lang="es">
+<head><title>Actualizar Usuario MySQLi</title></head>
+<body>
+    <h3>Actualizar Usuario (MySQLi)</h3>
+    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+        <div><label>ID a Actualizar</label><input type="number" name="id" required></div>
+        <div><label>Nuevo Nombre</label><input type="text" name="nombre" required></div>
+        <div><label>Nuevo Email</label><input type="email" name="email" required></div>
+        <input type="submit" value="Actualizar Usuario">
+    </form>
+</body>
+</html>
