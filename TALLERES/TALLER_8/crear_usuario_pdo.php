@@ -1,26 +1,27 @@
 <?php
 require_once "config_pdo.php";
+require_once "funciones_log.php";
 
 if($_SERVER["REQUEST_METHOD"] == "POST"){
-    $nombre = $_POST['nombre'];
-    $email = $_POST['email'];
-    
-    $sql = "INSERT INTO usuarios (nombre, email) VALUES (:nombre, :email)";
-    
-    if($stmt = $pdo->prepare($sql)){
-        $stmt->bindParam(":nombre", $nombre, PDO::PARAM_STR);
-        $stmt->bindParam(":email", $email, PDO::PARAM_STR);
+    try {
+        $nombre = $_POST['nombre'];
+        $email = $_POST['email'];
         
-        if($stmt->execute()){
+        $sql = "INSERT INTO usuarios (nombre, email) VALUES (:nombre, :email)";
+        
+        if($stmt = $pdo->prepare($sql)){
+            $stmt->bindParam(":nombre", $nombre, PDO::PARAM_STR);
+            $stmt->bindParam(":email", $email, PDO::PARAM_STR);
+            
+            $stmt->execute();
             echo "Usuario creado con éxito.";
-        } else{
-            echo "ERROR: No se pudo ejecutar $sql. " . $stmt->errorInfo()[2];
+            unset($stmt);
         }
+    } catch (PDOException $e) {
+        registrarError("Error PDO al crear usuario: " . $e->getMessage());
+        echo "Ocurrió un error al intentar crear el usuario. Por favor intente más tarde.";
     }
-    
-    unset($stmt);
 }
-
 unset($pdo);
 ?>
 
