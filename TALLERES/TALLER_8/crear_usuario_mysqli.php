@@ -1,25 +1,27 @@
 <?php
 require_once "config_mysqli.php";
+require_once "funciones_log.php";
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 if($_SERVER["REQUEST_METHOD"] == "POST"){
-    $nombre = mysqli_real_escape_string($conn, $_POST['nombre']);
-    $email = mysqli_real_escape_string($conn, $_POST['email']);
-    
-    $sql = "INSERT INTO usuarios (nombre, email) VALUES (?, ?)";
-    
-    if($stmt = mysqli_prepare($conn, $sql)){
-        mysqli_stmt_bind_param($stmt, "ss", $nombre, $email);
+    try {
+        $nombre = $_POST['nombre'];
+        $email = $_POST['email'];
         
-        if(mysqli_stmt_execute($stmt)){
+        $sql = "INSERT INTO usuarios (nombre, email) VALUES (?, ?)";
+        
+        if($stmt = mysqli_prepare($conn, $sql)){
+            mysqli_stmt_bind_param($stmt, "ss", $nombre, $email);
+            
+            mysqli_stmt_execute($stmt);
             echo "Usuario creado con éxito.";
-        } else{
-            echo "ERROR: No se pudo ejecutar $sql. " . mysqli_error($conn);
+            mysqli_stmt_close($stmt);
         }
+    } catch (Exception $e) {
+        registrarError("Error MySQLi al crear usuario: " . $e->getMessage());
+        echo "Ocurrió un error al intentar crear el usuario. Por favor intente más tarde.";
     }
-    
-    mysqli_stmt_close($stmt);
 }
-
 mysqli_close($conn);
 ?>
 
