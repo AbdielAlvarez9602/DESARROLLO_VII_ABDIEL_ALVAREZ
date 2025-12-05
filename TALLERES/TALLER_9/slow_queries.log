@@ -1,0 +1,3 @@
+[2025-12-05 22:16:28] DURACIÓN: 0.00168s | SQL: SELECT SQL_NO_CACHE * FROM ventas v 
+               JOIN detalles_venta dv ON v.id = dv.venta_id 
+               JOIN productos p ON dv.producto_id = p.id
