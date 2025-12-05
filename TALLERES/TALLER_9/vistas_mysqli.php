@@ -1,8 +1,6 @@
 <?php
 require_once "config_mysqli.php";
 
-// --- FUNCIONES DEL EJEMPLO ---
-
 function mostrarResumenCategorias($conn) {
     $sql = "SELECT * FROM vista_resumen_categorias";
     $result = mysqli_query($conn, $sql);
@@ -41,14 +39,11 @@ function mostrarProductosPopulares($conn) {
     echo "</table>";
 }
 
-// --- FUNCIONES DE LA TAREA (NUEVAS) ---
-
 function mostrarBajoStock($conn) {
-    // Tarea A
     $sql = "SELECT * FROM vista_productos_bajo_stock";
     $result = mysqli_query($conn, $sql);
 
-    echo "<h3>⚠️ Alerta de Bajo Stock (< 5 unidades):</h3>";
+    echo "<h3> Alerta de Bajo Stock (< 5 unidades):</h3>";
     if (mysqli_num_rows($result) > 0) {
         echo "<table border='1' cellpadding='5' style='border-collapse: collapse; width: 100%; border-color: red;'>";
         echo "<tr style='background-color: #ffe6e6;'><th>Producto</th><th>Stock Actual</th><th>Categoría</th><th>Histórico Ventas</th></tr>";
@@ -67,7 +62,6 @@ function mostrarBajoStock($conn) {
 }
 
 function mostrarHistorialClientes($conn) {
-    // Tarea B (Limitamos a 10 para no saturar la pantalla)
     $sql = "SELECT * FROM vista_historial_completo_clientes LIMIT 10";
     $result = mysqli_query($conn, $sql);
 
@@ -86,7 +80,6 @@ function mostrarHistorialClientes($conn) {
 }
 
 function mostrarMetricasCategorias($conn) {
-    // Tarea C
     $sql = "SELECT * FROM vista_metricas_categorias_avanzada";
     $result = mysqli_query($conn, $sql);
 
@@ -105,7 +98,6 @@ function mostrarMetricasCategorias($conn) {
 }
 
 function mostrarTendenciasMensuales($conn) {
-    // Tarea D
     $sql = "SELECT * FROM vista_tendencias_mensuales";
     $result = mysqli_query($conn, $sql);
 
@@ -122,7 +114,6 @@ function mostrarTendenciasMensuales($conn) {
     echo "</table>";
 }
 
-// EJECUCIÓN
 echo "<h1>Panel de Control con Vistas (MySQLi)</h1>";
 mostrarResumenCategorias($conn);
 mostrarProductosPopulares($conn);
@@ -133,4 +124,5 @@ mostrarMetricasCategorias($conn);
 mostrarTendenciasMensuales($conn);
 
 mysqli_close($conn);
+
 ?>
