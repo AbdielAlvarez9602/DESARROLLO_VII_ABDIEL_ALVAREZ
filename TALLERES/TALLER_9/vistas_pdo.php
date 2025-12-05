@@ -1,8 +1,6 @@
 <?php
 require_once "config_pdo.php";
 
-// --- FUNCIONES DEL EJEMPLO ---
-
 function mostrarResumenCategorias($pdo) {
     try {
         $stmt = $pdo->query("SELECT * FROM vista_resumen_categorias");
@@ -41,14 +39,11 @@ function mostrarProductosPopulares($pdo) {
     } catch (PDOException $e) { echo "Error: " . $e->getMessage(); }
 }
 
-// --- FUNCIONES DE LA TAREA (NUEVAS) ---
-
 function mostrarBajoStock($pdo) {
     try {
         $stmt = $pdo->query("SELECT * FROM vista_productos_bajo_stock");
         echo "<h3>⚠️ Alerta de Bajo Stock (< 5 unidades):</h3>";
         
-        // Usamos fetchAll para contar antes de imprimir
         $resultados = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         if (count($resultados) > 0) {
@@ -122,7 +117,6 @@ function mostrarTendenciasMensuales($pdo) {
     } catch (PDOException $e) { echo "Error: " . $e->getMessage(); }
 }
 
-// EJECUCIÓN
 echo "<h1>Panel de Control con Vistas (PDO)</h1>";
 mostrarResumenCategorias($pdo);
 mostrarProductosPopulares($pdo);
@@ -133,4 +127,5 @@ mostrarMetricasCategorias($pdo);
 mostrarTendenciasMensuales($pdo);
 
 $pdo = null;
+
 ?>
