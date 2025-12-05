@@ -1,45 +1,29 @@
 <?php
 session_start();
+// ... (Configuración de conexión a BD) ...
 
-$dbHost = '127.0.0.1';
-$dbName = 'mini_biblio';
-$dbUser = 'root';
-$dbPass = 'root'; // <-- Contraseña corregida
-
-function pdo() {
-    global $dbHost, $dbName, $dbUser, $dbPass;
-    static $pdo = null;
-    
-    if ($pdo === null) {
-        $dsn = "mysql:host=$dbHost;dbname=$dbName;charset=utf8mb4";
-        $pdo = new PDO($dsn, $dbUser, $dbPass,
-            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-        );
-    }
-    return $pdo;
-}
-
+// SEGURIDAD: Si no está logueado, matamos el proceso. Nadie puede guardar libros sin usuario.
 if (!isset($_SESSION['user'])) {
     die("Debes iniciar sesión.");
 }
 
 $pdo = pdo();
 
-// --- OPERACIÓN ELIMINAR (DELETE) ---
+// --- 1. OPERACIÓN ELIMINAR (DELETE) ---
 if (isset($_POST["action"]) && $_POST["action"] === "delete") {
-    // Usamos sentencias preparadas para seguridad (SQL Injection)
+    // Preparamos la consulta. IMPORTANTE: 'AND user_id = :u' asegura que solo puedas borrar TUS propios libros.
     $pdo->prepare("DELETE FROM libros_guardados WHERE id = :id AND user_id = :u")
         ->execute([
             ':id' => $_POST["id"],
-            ':u' => $_SESSION["user"]["id"]
+            ':u' => $_SESSION["user"]["id"] // Usamos el ID de la sesión
         ]);
-    header("Location: index.php");
+    header("Location: index.php"); // Volvemos al inicio
     exit;
 }
 
-// --- OPERACIÓN ACTUALIZAR RESEÑA (UPDATE) ---
+// --- 2. OPERACIÓN ACTUALIZAR RESEÑA (UPDATE) ---
 if (isset($_POST["action"]) && $_POST["action"] === "update_review") {
-    // Usamos sentencias preparadas para seguridad (SQL Injection)
+    // Actualizamos solo el campo 'reseña_personal'
     $pdo->prepare("UPDATE libros_guardados SET reseña_personal = :r WHERE id = :id AND user_id = :u")
         ->execute([
             ':r' => $_POST["reseña_personal"],
@@ -50,29 +34,29 @@ if (isset($_POST["action"]) && $_POST["action"] === "update_review") {
     exit;
 }
 
-// --- OPERACIÓN GUARDAR LIBRO (CREATE) ---
+// --- 3. OPERACIÓN GUARDAR NUEVO LIBRO (CREATE/INSERT) ---
 
-// 1. Validar que el libro no esté ya guardado
+// Paso A: Evitar duplicados.
+// Verificamos si este usuario ya guardó este libro antes (buscando por el ID de Google).
 $stmt = $pdo->prepare("SELECT id FROM libros_guardados WHERE google_books_id = :gid AND user_id = :uid");
 $stmt->execute([
     ':gid' => $_POST['google_books_id'],
     ':uid' => $_SESSION['user']['id']
 ]);
 if ($stmt->fetch()) {
-    // Si ya existe, redirigir y evitar duplicados
+    // Si la consulta encuentra algo, redirigimos sin guardar.
     header("Location: index.php?status=duplicate");
     exit;
 }
 
-// 2. Insertar nuevo libro
-// Usamos sentencias preparadas para seguridad (SQL Injection)
+// Paso B: Insertar.
 $pdo->prepare("
     INSERT INTO libros_guardados
     (user_id, google_books_id, titulo, autor, imagen_portada, reseña_personal, fecha_guardado)
     VALUES
     (:uid, :gid, :t, :a, :i, :r, NOW())
 ")->execute([
-    ':uid' => $_SESSION["user"]["id"],
+    ':uid' => $_SESSION["user"]["id"], // El dueño del libro es el usuario en sesión
     ':gid' => $_POST["google_books_id"],
     ':t' => $_POST["titulo"],
     ':a' => $_POST["autor"],
@@ -82,3 +66,4 @@ $pdo->prepare("
 
 header("Location: index.php");
 exit;
+?>
